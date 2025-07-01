@@ -52,7 +52,7 @@ if __name__ == "__main__":
     extractor = SpectralFlux("data_sample.wav")
     print(f"onset times {extractor.get_onset_times()}")
     print(
-        f"found {len(extractor.get_audio_segments())} audio segments/spectrgrams of each note"
+        f"found {len(extractor.get_audio_segments())} spectrgrams of each note"
     )
 
 # TODO
