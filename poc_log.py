@@ -2,7 +2,7 @@ import madmom
 import numpy as np
 
 
-class SuperFlux: #spectral flux but with log filtering instead of linear filtering
+class SuperFlux:  # spectral flux but with log filtering instead of linear filtering
     def __init__(self, num_bands=24, diff_max_bins=3, positive_diffs=True):
         """
         This init allows us to set optional parameters before doing log filtering
@@ -10,7 +10,6 @@ class SuperFlux: #spectral flux but with log filtering instead of linear filteri
         self.num_bands = num_bands
         self.diff_max_bins = diff_max_bins
         self.positive_diffs = positive_diffs
-        
 
     def process(self, data):
         """
@@ -31,3 +30,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# TODO
+# ADD FUNCTIONALITY TO ACTUALLY SEPERATE EACH MUSICAL NOT(E)
