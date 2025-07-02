@@ -4,6 +4,8 @@ from madmom.features.onsets import OnsetPeakPickingProcessor, spectral_flux
 from madmom.audio.spectrogram import Spectrogram
 from madmom.audio.signal import Signal
 
+logging.getLogger("madmom").setLevel(logging.ERROR)
+
 
 def generate_spectrogram(wav_file):
     """Generate a spectrogram of a wav file"""
@@ -84,8 +86,12 @@ if __name__ == "__main__":
         f"found {len(extractor.get_audio_segments())} spectrgrams of each note"
     )
 
+    
+
 # TODO
 # would be funny to make the for loop a list comp or somn but i seriously doubt it's worth/possible lol
 
 # TODO
 # ADD FUNCTIONALITY TO ACTUALLY SEPERATE EACH MUSICAL NOT(E)
+
+

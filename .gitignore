@@ -24,15 +24,18 @@ share/python-wheels/
 MANIFEST
 
 # Environments
-.env
+*.env
 !example_connections.env
 .envrc
-.venv
+*.venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+#Jupyter
+models/.ipynb_checkpoints/
 
 # Testing
 */.wav
