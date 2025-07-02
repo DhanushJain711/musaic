@@ -25,6 +25,7 @@ MANIFEST
 
 # Environments
 .env
+!example_connections.env
 .envrc
 .venv
 env/
