@@ -1,8 +1,10 @@
 import librosa
 import numpy as np
+import madmom
 from madmom.features.onsets import OnsetPeakPickingProcessor, spectral_flux
 from madmom.audio.spectrogram import Spectrogram
 from madmom.audio.signal import Signal
+import logging
 
 logging.getLogger("madmom").setLevel(logging.ERROR)
 
