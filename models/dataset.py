@@ -50,6 +50,15 @@ class GoodSoundsDatabase:
         df = df[~df['klass'].str.contains('scale', case=False, na=False)]
         df = self._add_file_info(df)
         return df
+
+    def get_sounds_by_klass_and_instrument(self, klass: str, instrument: str) -> pd.DataFrame:
+        """Get sounds filtered by both klass and instrument"""
+        query = "SELECT * FROM sounds WHERE klass = ? AND instrument = ?"
+        df = pd.read_sql_query(query, self.connection, params=[klass, instrument])
+        #Remove recordings that are scales; we want individual notes for now
+        df = df[~df['klass'].str.contains('scale', case=False, na=False)]
+        df = self._add_file_info(df)
+        return df
     
     def get_unique_klasses(self) -> List[str]:
         """Get all unique klass values"""
