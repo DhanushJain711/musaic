@@ -35,6 +35,15 @@ class GoodSoundsDatabase:
             logger.error(f"Error connecting to database: {e}")
             raise
     
+    def get_all_sounds(self) -> pd.DataFrame:
+        """Get all sounds from the database"""
+        query = "SELECT * FROM sounds"
+        df = pd.read_sql_query(query, self.connection)
+        #Remove recordings that are scales; we want individual notes for now
+        df = df[~df['klass'].str.contains('scale', case=False, na=False)]
+        df = self._add_file_info(df)
+        return df
+    
     def get_sounds_by_klass(self, klass: str) -> pd.DataFrame:
         """ Get sounds filtered by klass (note property label) """
         query = "SELECT * FROM sounds WHERE klass = ?"
@@ -78,16 +87,61 @@ class GoodSoundsDatabase:
             """Get the pack name from the pack_id"""
             query = "SELECT name FROM packs WHERE id = ?"
             self.cursor.execute(query, (pack_id,))
-            pack_name = self.cursor.fetchone()[0]
+            result = self.cursor.fetchone()
+            
+            if result is None:
+                logger.warning(f"Pack ID {pack_id} not found in packs table")
+                return None
+            
+            pack_name = result[0]
+            pack_full_path = f'{self.dataset_path}/{pack_name}'
+            
+            # Check if pack directory exists
+            if not os.path.exists(pack_full_path):
+                logger.warning(f"Pack directory not found: {pack_full_path}")
+                return None
 
             #Get subfolders (recording setup)
-            subfolders = [name for name in os.listdir(f'{self.dataset_path}/{pack_name}') if os.path.isdir(os.path.join(f'{self.dataset_path}/{pack_name}', name))]
-            return f'{self.dataset_path}/{pack_name}/{subfolders[0]}' #Just use first subfolder for now
+            try:
+                subfolders = [name for name in os.listdir(pack_full_path) 
+                            if os.path.isdir(os.path.join(pack_full_path, name))]
+                if not subfolders:
+                    logger.warning(f"No subfolders found in {pack_full_path}")
+                    return pack_full_path  # Return the pack path directly
+                
+                return f'{pack_full_path}/{subfolders[0]}' #Just use first subfolder for now
+            except OSError as e:
+                logger.error(f"Error accessing directory {pack_full_path}: {e}")
+                return None
         
         #Get paths to the packs
         df['file_path'] = df['pack_id'].apply(get_pack_path)
+        
+        # Filter out rows where pack_path couldn't be determined
+        initial_count = len(df)
+        df = df.dropna(subset=['file_path'])
+        filtered_count = len(df)
+        
+        if filtered_count < initial_count:
+            logger.warning(f"Filtered out {initial_count - filtered_count} records with missing pack information")
+        
         #Append the wav file names
         df['file_path'] = df['file_path'] + '/' + df['pack_filename']
+        
+        # Filter out rows where the actual audio file doesn't exist
+        def file_exists(file_path):
+            return os.path.exists(file_path)
+        
+        df['file_exists'] = df['file_path'].apply(file_exists)
+        missing_files = df[~df['file_exists']]
+        if len(missing_files) > 0:
+            logger.warning(f"Found {len(missing_files)} records with missing audio files")
+            # Log a few examples
+            for i, (_, row) in enumerate(missing_files.head(3).iterrows()):
+                logger.warning(f"  Missing file: {row['file_path']}")
+        
+        df = df[df['file_exists']].drop('file_exists', axis=1)
+        
         return df
     
     def close(self):

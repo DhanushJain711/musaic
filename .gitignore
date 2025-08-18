@@ -35,7 +35,10 @@ env.bak/
 venv.bak/
 
 #Jupyter
-models/.ipynb_checkpoints/
+.ipynb_checkpoints/
+
+#Specific test notebooks
+models/query.ipynb
 
 # Testing
 */.wav
