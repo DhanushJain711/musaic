@@ -42,6 +42,7 @@ models/query.ipynb
 
 # Testing
 */.wav
+*.wav
 
 #Cursor
 .cursorrules
